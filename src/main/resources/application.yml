@@ -159,3 +159,8 @@ akhq:
       no-roles:
         name: no-roles
         roles: []
+
+  connections:
+    kafka:
+      properties:
+        bootstrap.servers: "localhost:9092"
