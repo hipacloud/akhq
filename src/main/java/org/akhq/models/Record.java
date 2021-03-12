@@ -143,7 +143,8 @@ public class Record {
                     return new String(payload);
                 }
             }
-            return new String(payload);
+            return Base64.getEncoder().encodeToString(payload);
+//            return new String(payload);
         }
     }
 
