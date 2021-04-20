@@ -1,0 +1,47 @@
+name: akhq
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-docker-image:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Git Checkout
+      uses: actions/checkout@v2
+    - uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '11'
+    - name: gradle build
+      run: ./gradlew shadowJar && ls -al ./build/libs
+    # - name: Configure AWS Credentials
+    #   uses: aws-actions/configure-aws-credentials@v1
+    #   with:
+    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     aws-region: cn-northwest-1
+    # - name: Login to Amazon ECR
+    #   id: login-ecr
+    #   uses: aws-actions/amazon-ecr-login@v1
+    # - name: Set Docker image tag
+    #   run: |
+    #     echo "DOCKER_IMAGE_NAME=${{ steps.login-ecr.outputs.registry }}/devops:akhq-${VERSION}-`date +'%Y%m%d'`-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+    # - name: Docker build and push
+    #   run: |
+    #     docker build -f docker/Dockerfile --build-arg VERSION=$VERSION -t $DOCKER_IMAGE_NAME .
+    #     docker push $DOCKER_IMAGE_NAME
+    # - name: Wechatwork robot notify
+    #   if: success()
+    #   uses: blunt1973/wechatwork-action@master
+    #   with:
+    #     url: ${{ secrets.WECHATWORK_DEVOPS_WEBHOOK}}
+    #     type: markdown
+    #     content: |
+    #       ${DOCKER_IMAGE_NAME}
+    #       build success!
+    # - name: Logout of Amazon ECR
+    #   if: always()
+    #   run: docker logout ${{ steps.login-ecr.outputs.registry }}
