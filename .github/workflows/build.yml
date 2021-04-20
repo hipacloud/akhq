@@ -26,16 +26,26 @@ jobs:
         key: ${{ runner.os }}-wrapper-${{ hashFiles('**/*.gradle') }}
         restore-keys: |
           ${{ runner.os }}-wrapper-
+    - name: Npm cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+    - name: Node cache
+      uses: actions/cache@v1
+      with:
+        path: node
+        key: ${{ runner.os }}-node-${{ hashFiles('**/*.gradle') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
     - uses: actions/setup-java@v2
       with:
         distribution: 'adopt'
         java-version: '11'
-      # Gradle check
-    - name: Build with Gradle
-      run: |
-        ./gradlew classes testClasses --parallel --no-daemon
-        ./gradlew check --no-daemon
-    # Shadow Jar, Tar and Zip
+    # Shadow Jar
     - name: Build jars and distribution archives
       run: ./gradlew shadowJar --no-daemon && ls -alh ./build/libs
     - name: Copy jar to docker
