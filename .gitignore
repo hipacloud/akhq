@@ -49,3 +49,7 @@ docker-compose.override.yml
 ## Helm
 helm/akhq/README.md
 helm/akhq/LICENSE
+
+*.iml
+*.ipr
+*.iws
