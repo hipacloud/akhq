@@ -112,7 +112,8 @@ akhq:
           - topic/delete
           - registry/version/delete
         attributes:
-          topics-filter-regexp: "test.*"
+          topics-filter-regexp:
+            - "test.*"
       operator:
         name: operator
         roles:
@@ -121,7 +122,8 @@ akhq:
           - topic/data/insert
           - topic/data/delete
         attributes:
-          topics-filter-regexp: "test-operator.*"
+          topics-filter-regexp:
+            - "test-operator.*"
       no-filter:
         name: no-filter
         roles:
@@ -131,6 +133,10 @@ akhq:
           - registry/version/delete
     basic-auth:
       - username: user
+        password: d74ff0ee8da3b9806b18c877dbf29bbde50b5bd8e4dad7a3a725000feb82e8f1
+        groups:
+          - limited
+      - username: MyUser3!@yàhöù.com
         password: d74ff0ee8da3b9806b18c877dbf29bbde50b5bd8e4dad7a3a725000feb82e8f1
         groups:
           - limited
@@ -150,4 +156,3 @@ akhq:
         - username: user2
           groups:
             - operator
-
