@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.akhq.configs.SchemaRegistryType;
 import org.akhq.utils.AvroToJsonSerializer;
+import org.akhq.utils.PickleDeserializer;
 import org.akhq.utils.ProtobufToJsonDeserializer;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -124,7 +125,7 @@ public class Record {
         } else if (schemaId != null) {
             try {
                 Object toType = kafkaAvroDeserializer.deserialize(topic, payload);
-                
+
                 //for primitive avro type
                 if (!(toType instanceof GenericRecord)){
                     return String.valueOf(toType);
@@ -150,7 +151,8 @@ public class Record {
                     return new String(payload);
                 }
             }
-            return Base64.getEncoder().encodeToString(payload);
+            return PickleDeserializer.getInstance().deserialize(payload);
+//            return Base64.getEncoder().encodeToString(payload);
 //            return new String(payload);
         }
     }
