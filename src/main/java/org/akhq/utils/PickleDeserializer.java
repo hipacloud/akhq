@@ -12,15 +12,18 @@ import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class PickleDeserializer {
 
     private static PickleDeserializer INSTANCE;
 
-    private static String PYTHON_EXECUTABLE = PickleDeserializer.class.getClassLoader()
-        .getResource("venv/bin/python").getPath();
+    private static final String PYTHON_EXECUTABLE =
+        Objects.requireNonNull(
+            PickleDeserializer.class.getClassLoader().getResource("venv/bin/python")
+        ).getPath();
 
-    private Value pySerde;
+    private final Value pySerde;
 
     public PickleDeserializer() {
         Context context = Context.newBuilder("python").
@@ -29,17 +32,18 @@ public class PickleDeserializer {
             option("python.Executable", PYTHON_EXECUTABLE).
             build();
 
-        Source source;
-        try {
-            InputStream codeInputStream = PickleDeserializer.class.getClassLoader().getResourceAsStream("serde.py");
-            InputStreamReader codeReader = new InputStreamReader(codeInputStream);
-            source = Source.newBuilder("python", codeReader, "serde.py").build();
+        context.eval(getSerdeSource());
+        pySerde = context.getPolyglotBindings().getMember("deserialize");
+    }
+
+    private Source getSerdeSource() {
+        InputStream codeInputStream = getClass().getClassLoader().getResourceAsStream("serde.py");
+
+        try (InputStreamReader codeReader = new InputStreamReader(Objects.requireNonNull(codeInputStream))) {
+            return Source.newBuilder("python", codeReader, "serde.py").build();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        context.eval(source);
-        pySerde = context.getPolyglotBindings().getMember("deserialize");
     }
 
     public String deserialize(byte[] payload) {
