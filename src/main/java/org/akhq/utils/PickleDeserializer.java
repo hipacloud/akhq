@@ -12,24 +12,22 @@ import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
+import java.nio.file.Paths;
 
 public class PickleDeserializer {
 
     private static PickleDeserializer INSTANCE;
-
-    private static final String PYTHON_EXECUTABLE =
-        Objects.requireNonNull(
-            PickleDeserializer.class.getClassLoader().getResource("venv/bin/python")
-        ).getPath();
+    private static final String VENV_HOME = System.getenv("VENV_HOME");
 
     private final Value pySerde;
 
     public PickleDeserializer() {
+        String PYTHON_EXE = Paths.get(VENV_HOME, "bin", "python").toAbsolutePath().toString();
+
         Context context = Context.newBuilder("python").
             allowAllAccess(true).
             option("python.ForceImportSite", "true").
-            option("python.Executable", PYTHON_EXECUTABLE).
+            option("python.Executable", PYTHON_EXE).
             build();
 
         context.eval(getSerdeSource());
@@ -38,9 +36,12 @@ public class PickleDeserializer {
 
     private Source getSerdeSource() {
         InputStream codeInputStream = getClass().getClassLoader().getResourceAsStream("serde.py");
+        assert codeInputStream != null;
 
-        try (InputStreamReader codeReader = new InputStreamReader(Objects.requireNonNull(codeInputStream))) {
-            return Source.newBuilder("python", codeReader, "serde.py").build();
+        try {
+            try (InputStreamReader codeReader = new InputStreamReader(codeInputStream)) {
+                return Source.newBuilder("python", codeReader, "serde.py").build();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

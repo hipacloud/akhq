@@ -1,4 +1,4 @@
-FROM openjdk:11-jre-slim
+FROM findepi/graalvm:21.2.0-java11-polyglot
 
 # install curl
 RUN apt-get update && \
@@ -9,7 +9,12 @@ RUN apt-get update && \
 
 WORKDIR /app
 COPY docker /
-ENV MICRONAUT_CONFIG_FILES=/app/application.yml
+
+RUN graalpython -m venv /app/venv
+RUN /app/venv/bin/pip install pymongo
+
+ENV MICRONAUT_CONFIG_FILES=/app/application.yml VENV_HOME=/app/venv
+
 # Create user
 RUN useradd -ms /bin/bash akhq
 # Chown to write configuration

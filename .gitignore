@@ -54,4 +54,4 @@ helm/akhq/LICENSE
 *.ipr
 *.iws
 
-src/main/resources/venv
+venv
