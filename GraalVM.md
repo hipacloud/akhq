@@ -29,5 +29,5 @@ pip install pymongo
 
 * Start AKHQ with GraalVM
 ```
-VENV_HOME=`pwd`/venv ./gradlew run
+MICRONAUT_SERVER_PORT=8086 VENV_HOME=`pwd`/venv ./gradlew run
 ```
